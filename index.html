@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clases de Prueba · CORE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@700&family=Roboto:wght@300;400;500;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<style>
+:root {
+  --orange:  #FF5C33;
+  --dark:    #333333;
+  --mid:     #474747;
+  --grey:    #9DA5A8;
+  --light:   #C9D1D3;
+  --white:   #FFFFFF;
+  --bg:      #1a1a1a;
+  --bg2:     #242424;
+  --bg3:     #2e2e2e;
+  --bg4:     #383838;
+  --border:  rgba(255,255,255,0.08);
+  --text:    #F0EEEA;
+  --muted:   #9DA5A8;
+  --font:    'Roboto', sans-serif;
+  --green:   #3FA66B;
+  --amber:   #E0A526;
+  --red:     #D9483A;
+  --whatsapp:#25D366;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; min-height: 100vh; }
+
+header {
+  background: #111111; border-bottom: 2px solid var(--orange); padding: 0 2.5rem;
+  display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 1rem;
+}
+.header-left { display: flex; align-items: center; gap: 1.25rem; }
+.logo-text { font-family: 'Poppins', sans-serif; font-size: 22px; font-weight: 700; color: white; letter-spacing: .05em; line-height: 1; }
+.header-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.15); }
+.header-title { font-size: 13px; font-weight: 300; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; }
+.header-title strong { color: var(--white); font-weight: 500; }
+.header-right { font-size: 11px; color: var(--muted); letter-spacing: .04em; display:flex; align-items:center; gap:.5rem; }
+.no-cache-badge { border:1px solid var(--border); border-radius: 4px; padding: .25rem .6rem; font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--grey); }
+
+main { padding: 1.75rem 2.5rem 3rem; max-width: 1500px; margin: 0 auto; }
+
+/* ============ UPLOAD ============ */
+.upload-zone {
+  margin-top: 3rem; border: 2px dashed var(--border); border-radius: 12px; padding: 3.5rem 2rem;
+  text-align: center; background: var(--bg2); transition: border-color .2s, background .2s; cursor: pointer;
+}
+.upload-zone.dragover { border-color: var(--orange); background: var(--bg3); }
+.upload-zone h2 { font-family: 'Poppins', sans-serif; font-size: 20px; margin-bottom: .6rem; }
+.upload-zone p { color: var(--muted); font-size: 13px; margin-bottom: 1.5rem; line-height: 1.6; }
+.upload-zone input[type=file] { display: none; }
+.btn-upload {
+  background: var(--orange); border: none; color: white; font-family: var(--font); font-size: 12px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: .7rem 1.6rem;
+  border-radius: 5px; cursor: pointer; transition: opacity .2s; display:inline-flex; align-items:center; gap:8px;
+}
+.btn-upload:hover { opacity: .85; }
+.upload-status { margin-top: 1.25rem; font-size: 12.5px; color: var(--muted); min-height: 18px; }
+.upload-status.err { color: #ff6b6b; }
+.upload-status.ok { color: var(--green); }
+.file-info-bar {
+  display: flex; align-items: center; justify-content: space-between; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: 8px; padding: .7rem 1.1rem; margin-bottom: 1.25rem; font-size: 12.5px; color: var(--muted);
+}
+.file-info-bar strong { color: var(--text); }
+.btn-reload {
+  background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: var(--font);
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; padding: .4rem .9rem;
+  border-radius: 4px; cursor: pointer;
+}
+.btn-reload:hover { border-color: var(--orange); color: var(--text); }
+
+/* ============ TABS ============ */
+.tabs { display: flex; gap: .5rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); }
+.tab-btn {
+  background: transparent; border: none; color: var(--muted); font-family: var(--font); font-size: 12.5px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: .05em; padding: .7rem 1rem; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.tab-btn.active { color: var(--text); border-bottom-color: var(--orange); }
+.tab-btn .count-pill { background: var(--bg4); color: var(--light); font-size: 10.5px; padding: 1px 7px; border-radius: 10px; margin-left: 6px; }
+
+/* ============ FILTER BAR ============ */
+.filter-bar {
+  display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: 8px; padding: .85rem 1.1rem; margin-bottom: 1.25rem;
+}
+.filter-mode { display: flex; background: var(--bg3); border-radius: 6px; padding: 3px; gap: 2px; }
+.filter-mode button {
+  background: transparent; border: none; color: var(--muted); font-family: var(--font); font-size: 11.5px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: .05em; padding: .4rem .8rem; border-radius: 4px; cursor: pointer;
+}
+.filter-mode button.active { background: var(--orange); color: white; }
+.filter-controls { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.filter-controls input[type=date] {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--font);
+  font-size: 12.5px; padding: .4rem .6rem; border-radius: 5px;
+}
+.filter-controls label { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.filter-sep { color: var(--grey); font-size: 12px; }
+.filter-range-label { font-size: 12.5px; color: var(--light); background: var(--bg3); padding: .35rem .75rem; border-radius: 5px; border: 1px solid var(--border); }
+.btn-clear-filter { background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 11px; padding: .4rem .7rem; border-radius: 5px; cursor: pointer; margin-left: auto; text-transform: uppercase; letter-spacing: .05em; }
+.btn-clear-filter:hover { border-color: var(--orange); color: var(--text); }
+
+/* ============ SEDE PICKER ============ */
+.sede-picker { position: relative; }
+.btn-sede-picker {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: var(--font);
+  font-size: 12px; font-weight: 600; padding: .45rem .8rem; border-radius: 6px; cursor: pointer;
+  display: flex; align-items: center; gap: 7px;
+}
+.btn-sede-picker:hover { border-color: var(--orange); }
+.btn-sede-picker .n { background: var(--orange); color: #fff; font-weight: 700; border-radius: 10px; padding: 1px 7px; font-size: 10.5px; }
+.sede-picker-panel {
+  display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 40; width: 280px;
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: .7rem; box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+.sede-picker-panel.open { display: block; }
+.sede-picker-panel input[type="text"] {
+  width: 100%; margin-bottom: 8px; background: var(--bg2); border: 1px solid var(--border); color: var(--text);
+  font-family: var(--font); font-size: 12.5px; padding: .4rem .6rem; border-radius: 5px;
+}
+.sede-picker-actions { display: flex; gap: 6px; margin-bottom: 8px; }
+.sede-picker-actions button {
+  background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: var(--font);
+  font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; padding: .3rem .6rem;
+  border-radius: 4px; cursor: pointer;
+}
+.sede-picker-actions button:hover { border-color: var(--orange); color: var(--orange); }
+.sede-picker-list { max-height: 280px; overflow-y: auto; }
+.sede-picker-item { display: flex; align-items: center; gap: 8px; padding: 5px 4px; font-size: 12px; cursor: pointer; border-radius: 4px; }
+.sede-picker-item:hover { background: rgba(255,255,255,.04); }
+.sede-picker-item input { cursor: pointer; }
+
+/* ============ SEDE GRID (tarjetas) ============ */
+.sede-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: .7rem; }
+.sede-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: .9rem 1rem; cursor: pointer;
+  transition: border-color .15s, transform .1s;
+}
+.sede-card:hover { border-color: var(--orange); transform: translateY(-1px); }
+.sede-card-top { display: flex; align-items: center; gap: .5rem; margin-bottom: .6rem; }
+.sede-card .sede-count-big { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 26px; color: var(--orange); line-height: 1; }
+.sede-card .sede-count-lbl { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
+
+/* ============ MODAL ============ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 100;
+  align-items: center; justify-content: center; padding: 2rem;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; max-width: 900px; width: 100%;
+  max-height: 85vh; display: flex; flex-direction: column; overflow: hidden;
+}
+.modal-head { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.3rem; border-bottom: 1px solid var(--border); }
+.modal-head-left { display: flex; align-items: center; gap: .7rem; }
+.modal-title { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 700; }
+.modal-close { background: transparent; border: none; color: var(--muted); font-size: 20px; cursor: pointer; line-height: 1; padding: 4px; }
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 1.1rem 1.3rem 1.4rem; overflow-y: auto; }
+
+/* ============ SUMMARY ============ */
+.summary-row { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.summary-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.4rem; flex: 1; min-width: 160px;
+}
+.summary-card .num { font-family: 'Poppins', sans-serif; font-size: 30px; font-weight: 700; line-height: 1; }
+.summary-card .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-top: .4rem; }
+.summary-card.reg .num { color: var(--green); }
+.summary-card.anu .num { color: var(--red); }
+.summary-card.act .num { color: var(--orange); }
+
+/* ============ SEDE LIST (compat) ============ */
+.sede-name { font-weight: 500; font-size: 13.5px; }
+.sede-num-badge { background: var(--bg4); color: var(--light); font-size: 10.5px; padding: 2px 7px; border-radius: 4px; font-weight: 600; }
+.sede-actions { display: flex; gap: .6rem; margin-bottom: .8rem; flex-wrap: wrap; }
+.btn-wa { background: var(--whatsapp); border: none; color: #08331b; font-family: var(--font); font-size: 11.5px; font-weight: 700;
+  padding: .45rem 1rem; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: .03em; }
+.btn-wa:hover { opacity: .88; }
+.btn-wa.outline { background: transparent; border: 1px solid var(--whatsapp); color: var(--whatsapp); }
+.btn-wa:disabled { opacity: .35; cursor: not-allowed; }
+.sede-hint { font-size: 10.5px; color: var(--grey); margin-bottom: .7rem; }
+
+table.detail-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+table.detail-table th {
+  text-align: left; color: var(--muted); font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em;
+  padding: .5rem .6rem; border-bottom: 1px solid var(--border);
+}
+table.detail-table td { padding: .5rem .6rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+table.detail-table tr:last-child td { border-bottom: none; }
+table.detail-table tr:hover td { background: var(--bg3); }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+.badge.confirmada { background: rgba(63,166,107,.15); color: var(--green); }
+.badge.registrada { background: rgba(224,165,38,.15); color: var(--amber); }
+.badge.anulada { background: rgba(217,72,58,.15); color: var(--red); }
+.empty-state { text-align: center; color: var(--muted); padding: 3rem 1rem; font-size: 13px; }
+.small-muted { color: var(--grey); font-size: 11.5px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="logo-text">CORE</div>
+    <div class="header-divider"></div>
+    <div class="header-title">Clases de Prueba · <strong>Panel por Sede</strong></div>
+  </div>
+  <div class="header-right">
+    <span class="no-cache-badge">Sin guardado — se pierde al recargar</span>
+  </div>
+</header>
+
+<main>
+
+  <div id="upload-screen">
+    <div class="upload-zone" id="drop-zone">
+      <h2>Cargá el Excel de clases de prueba</h2>
+      <p>Arrastrá el archivo acá o hacé click para elegirlo.<br>Tiene que tener la misma estructura que la planilla modelo (hoja "Detalle": Nombre, Teléfono, Correo electrónico, Actividad, Fecha de clase, Confirmada, Anulada, Sucursal…).<br>Nada se guarda: el archivo se procesa en el navegador y se pierde al recargar la página.</p>
+      <button class="btn-upload" onclick="document.getElementById('file-input').click()">📎 Elegir archivo Excel</button>
+      <input type="file" id="file-input" accept=".xlsx,.xls">
+      <div class="upload-status" id="upload-status"></div>
+    </div>
+  </div>
+
+  <div id="app-screen" style="display:none">
+
+    <div class="file-info-bar">
+      <span>Archivo cargado: <strong id="file-name"></strong> — <span id="file-count"></span> registros</span>
+      <button class="btn-reload" onclick="resetApp()">Cargar otro Excel</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-ok" onclick="switchTab('ok')">Clases de prueba <span class="count-pill" id="pill-ok">0</span></button>
+      <button class="tab-btn" id="tab-anu" onclick="switchTab('anu')">Anuladas <span class="count-pill" id="pill-anu">0</span></button>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-mode" id="filter-mode-buttons">
+        <button class="active" data-mode="dia" onclick="setFilterMode('dia')">Día</button>
+        <button data-mode="semana" onclick="setFilterMode('semana')">Semana</button>
+        <button data-mode="rango" onclick="setFilterMode('rango')">Rango</button>
+        <button data-mode="todo" onclick="setFilterMode('todo')">Todo</button>
+      </div>
+      <div class="filter-controls" id="filter-controls-dia">
+        <label>Fecha</label>
+        <input type="date" id="input-dia" onchange="renderAll()">
+      </div>
+      <div class="filter-controls" id="filter-controls-semana" style="display:none">
+        <label>Cualquier día de la semana</label>
+        <input type="date" id="input-semana" onchange="renderAll()">
+        <span class="filter-range-label" id="semana-range-label"></span>
+      </div>
+      <div class="filter-controls" id="filter-controls-rango" style="display:none">
+        <label>Desde</label>
+        <input type="date" id="input-rango-desde" onchange="renderAll()">
+        <span class="filter-sep">→</span>
+        <label>Hasta</label>
+        <input type="date" id="input-rango-hasta" onchange="renderAll()">
+      </div>
+      <div class="sede-picker">
+        <button class="btn-sede-picker" onclick="toggleSedePicker()">Sedes <span class="n" id="sede-picker-count">0</span> ▾</button>
+        <div class="sede-picker-panel" id="sede-picker-panel">
+          <input type="text" id="sede-picker-search" placeholder="Buscar sede…" oninput="renderSedePickerList()">
+          <div class="sede-picker-actions">
+            <button onclick="selectAllSedes()">Todas</button>
+            <button onclick="clearAllSedes()">Ninguna</button>
+          </div>
+          <div class="sede-picker-list" id="sede-picker-list"></div>
+        </div>
+      </div>
+      <button class="btn-clear-filter" onclick="setFilterMode('todo')">Ver todo</button>
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-card reg">
+        <div class="num" id="summary-total">0</div>
+        <div class="lbl" id="summary-total-label">Clases de prueba (confirmadas + registradas)</div>
+      </div>
+      <div class="summary-card act">
+        <div class="num" id="summary-sedes">0</div>
+        <div class="lbl">Sedes con clases en este período</div>
+      </div>
+      <div class="summary-card anu">
+        <div class="num" id="summary-anuladas">0</div>
+        <div class="lbl">Anuladas en este período</div>
+      </div>
+    </div>
+
+    <div class="sede-grid" id="sede-list"></div>
+
+  </div>
+
+</main>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-head-left">
+        <span class="sede-num-badge" id="modal-num"></span>
+        <span class="modal-title" id="modal-title"></span>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ====================== MAPEO DE SEDES (Excel -> número/label del HTML) ======================
+const SEDE_MAP = {
+  'RECOLETA, MONTEVIDEO':      { num: 1,  label: '1 - RECOLETA' },
+  'CAÑITAS':                   { num: 2,  label: '2 - CAÑITAS II' },
+  'PALERMO SOHO':               { num: 3,  label: '3 - PALERMO SOHO' },
+  'BARRIO NORTE':               { num: 4,  label: '4 - BARRIO NORTE' },
+  'RECOLETA, GUTIERREZ':        { num: 5,  label: '5 - GUTIERREZ' },
+  'BELGRANO, CABILDO':          { num: 6,  label: '6 - CABILDO' },
+  'CABALLITO':                  { num: 7,  label: '7 - CABALLITO' },
+  'PALERMO, SANTA FE':          { num: 8,  label: '8 - SANTA FE' },
+  'ALMAGRO':                    { num: 9,  label: '9 - ALMAGRO' },
+  'VILLA URQUIZA, CULLEN':      { num: 10, label: '10 - URQUIZA' },
+  'PALERMO, SCALABRINI':        { num: 11, label: '11 - SCALABRINI' },
+  'RECOLETA, JUNCAL':           { num: 12, label: '12 - JUNCAL' },
+  'COLEGIALES':                 { num: 13, label: '13 - COLEGIALES' },
+  'CARRANZA':                   { num: 14, label: '14 - CARRANZA' },
+  'VILLA URQUIZA, HOLMBERG':    { num: 15, label: '15 - HOLMBERG' },
+  'VICENTE LÓPEZ':              { num: 16, label: '16 - VICENTE LOPEZ' },
+  'BELGRANO, ARCOS':            { num: 17, label: '17 - ARCOS' },
+  'PALERMO CHICO':              { num: 18, label: '18 - PALERMO CHICO' },
+  'OLIVOS':                     { num: 19, label: '19 - OLIVOS' },
+  'SAAVEDRA':                   { num: 20, label: '20 - SAAVEDRA' },
+  'PILAR':                      { num: 21, label: '21 - PILAR' },
+  'QUILMES':                    { num: 22, label: '22 - QUILMES' },
+  'PARQUE CENTENARIO':          { num: 23, label: '23 - P. CENTENARIO' },
+  'TRIUNVIRATO':                { num: 24, label: '24 - TRIUNVIRATO' },
+  'DIRECTORIO':                 { num: 25, label: '25 - DIRECTORIO' },
+  'MANSILLA':                   { num: 26, label: '26 - MANSILLA' },
+  'COGHLAN':                    { num: 27, label: '27 - COGHLAN' },
+  'VILLA DEL PARQUE':           { num: 28, label: '28 - V.D. PARQUE' },
+  'BOEDO':                      { num: 29, label: '29 - BOEDO' },
+  'NUÑEZ, ARRIBEÑOS':           { num: 30, label: '30 - ARRIBEÑOS' },
+  'RETIRO, ESMERALDA':          { num: 31, label: '31 - ESMERALDA' },
+  'DEVOTO, NUEVA YORK':         { num: 32, label: '32 - DEVOTO' },
+  'MARTINEZ, EDUARDO COSTA':    { num: 33, label: '33 - MARTINEZ' }
+};
+
+// Teléfono de WhatsApp de cada sede, clave = número de sede (igual que en seguimiento-mkt.html)
+const PHONES_BY_SEDE_NUM = {
+  1: '5491134296899',  2: '5491155280578',  3: '5491155697666',  4: '5491171733276',
+  5: '5491130594152',  6: '5491134032534',  7: '5491169687108',  8: '5491134107676',
+  9: '5491134107678',  10: '5491140318285', 11: '5491154670472', 12: '5491171663417',
+  13: '5491165821138', 14: '5491161035695', 15: '5491160556008', 16: '5491160539795',
+  17: '5491123007028', 18: '5491162627431', 19: '5491125361731', 20: '5491124945373',
+  21: '5491168764459', 22: '5491180244212', 23: '5491168681814', 24: '5491168699044',
+  25: '5491168747973', 26: '5491167938887', 27: '5491130269217', 28: '5491130001629',
+  29: '5491153315669', 30: '5491130340067', 31: '5491130337185', 32: '5491124900155',
+  33: '5491171661730'
+};
+
+function sedeInfo(nombreExcel){
+  const key = (nombreExcel || '').trim().toUpperCase();
+  return SEDE_MAP[key] || { num: 9999, label: nombreExcel || '(Sin sede)' };
+}
+
+// Lista fija de sedes (num + label), ordenada, para el selector — no depende del excel cargado.
+const ALL_SEDE_LIST = Object.values(SEDE_MAP).sort((a,b) => a.num - b.num);
+const SEDE_PICKER_STORAGE_KEY = 'core_clases_prueba_sedes_seleccionadas';
+
+// ====================== ESTADO EN MEMORIA (nada se persiste) ======================
+let ALL_ROWS = [];      // todas las filas normalizadas del excel cargado
+let currentTab = 'ok';  // 'ok' | 'anu'
+let filterMode = 'dia'; // 'dia' | 'semana' | 'rango' | 'todo'
+let checkedIds = new Set();
+let selectedSedes = [];   // labels de sede elegidas en el picker (persistido en localStorage)
+let modalSedeKey = null;  // key de la sede abierta en el modal ("num|label"), o null
+
+// ====================== HELPERS DE FECHA ======================
+// Parsea "d/m/yyyy H:mm" (formato de texto tal cual viene en el excel) a Date local.
+function parseExcelDateStr(str){
+  if (!str) return null;
+  if (str instanceof Date) return isNaN(str.getTime()) ? null : str;
+  const s = String(str).trim();
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+  if (!m) return null;
+  const [, d, mo, y, h, mi] = m;
+  return new Date(parseInt(y,10), parseInt(mo,10)-1, parseInt(d,10), h?parseInt(h,10):0, mi?parseInt(mi,10):0);
+}
+function pad2(n){ return String(n).padStart(2,'0'); }
+function dateKey(d){ return d ? (d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate())) : ''; }
+function fmtFecha(d){ return d ? (pad2(d.getDate()) + '/' + pad2(d.getMonth()+1) + '/' + d.getFullYear()) : '—'; }
+function fmtHora(d){ return d ? (pad2(d.getHours()) + ':' + pad2(d.getMinutes())) : '—'; }
+function todayLocal(){ const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
+function inputDateToLocal(inputVal){
+  if (!inputVal) return null;
+  const [y,m,d] = inputVal.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function localToInputDate(d){
+  return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate());
+}
+function mondayOf(d){
+  const dow = d.getDay(); // 0=domingo
+  const diff = (dow === 0 ? -6 : 1 - dow);
+  const mon = new Date(d.getFullYear(), d.getMonth(), d.getDate() + diff);
+  return mon;
+}
+
+function escapeHtml(s){
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function cleanPhone(p){
+  if (!p) return '';
+  return String(p).replace(/[^\d+]/g, '');
+}
+
+// ====================== CARGA DE EXCEL ======================
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const uploadStatus = document.getElementById('upload-status');
+
+['dragenter','dragover'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('dragover'); }));
+['dragleave','drop'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('dragover'); }));
+dropZone.addEventListener('drop', e => { if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+dropZone.addEventListener('click', e => { if (e.target === dropZone || e.target.tagName === 'P' || e.target.tagName === 'H2') fileInput.click(); });
+fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
+
+async function handleFile(file){
+  if (!/\.xlsx?$/i.test(file.name)){
+    setUploadStatus('Formato no soportado. Subí un .xlsx', 'err');
+    return;
+  }
+  setUploadStatus('Leyendo "' + file.name + '"…', '');
+  try {
+    const buffer = await file.arrayBuffer();
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load(buffer);
+    const ws = wb.getWorksheet('Detalle') || wb.worksheets[0];
+    if (!ws) throw new Error('No se encontró ninguna hoja en el archivo.');
+
+    // Leemos la fila de headers para mapear columnas por nombre (robusto a orden distinto)
+    const headerRow = ws.getRow(1);
+    const colIndex = {};
+    headerRow.eachCell((cell, colNumber) => {
+      const h = String(cell.value || '').trim().toLowerCase();
+      colIndex[h] = colNumber;
+    });
+    const need = {
+      nombre: colIndex['nombre'],
+      telefono: colIndex['teléfono'] || colIndex['telefono'],
+      email: colIndex['correo electrónico'] || colIndex['correo electronico'] || colIndex['email'],
+      actividad: colIndex['actividad'],
+      fechaClase: colIndex['fecha de clase'],
+      confirmada: colIndex['confirmada'],
+      anulada: colIndex['anulada'],
+      sucursal: colIndex['sucursal']
+    };
+    const faltantes = Object.entries(need).filter(([k,v]) => !v).map(([k]) => k);
+    if (faltantes.length){
+      throw new Error('Faltan columnas esperadas en la hoja: ' + faltantes.join(', ') + '. Revisá que la estructura sea la misma que la planilla modelo.');
+    }
+
+    const rows = [];
+    ws.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return; // header
+      const nombre = row.getCell(need.nombre).value;
+      const sucursal = row.getCell(need.sucursal).value;
+      if (!nombre && !sucursal) return; // fila vacía
+      const fechaRaw = row.getCell(need.fechaClase).value;
+      const fecha = parseExcelDateStr(fechaRaw);
+      const confirmadaRaw = String(row.getCell(need.confirmada).value || '').trim().toUpperCase();
+      const anuladaRaw = String(row.getCell(need.anulada).value || '').trim().toUpperCase();
+      const anulada = anuladaRaw === 'SI' || anuladaRaw === 'SÍ';
+      const confirmada = confirmadaRaw === 'SI' || confirmadaRaw === 'SÍ';
+      const sInfo = sedeInfo(sucursal);
+      rows.push({
+        id: rowNumber,
+        nombre: nombre || '',
+        telefono: row.getCell(need.telefono).value || '',
+        email: need.email ? (row.getCell(need.email).value || '') : '',
+        actividad: row.getCell(need.actividad).value || '',
+        fecha: fecha,
+        confirmada: confirmada,
+        anulada: anulada,
+        sedeExcel: sucursal || '',
+        sedeNum: sInfo.num,
+        sedeLabel: sInfo.label
+      });
+    });
+
+    if (!rows.length) throw new Error('No se encontraron filas de datos en la hoja "Detalle".');
+
+    ALL_ROWS = rows;
+    setUploadStatus('Listo: ' + rows.length + ' registros cargados.', 'ok');
+    document.getElementById('file-name').textContent = file.name;
+    document.getElementById('file-count').textContent = rows.length;
+    // Default: filtro por día = hoy
+    document.getElementById('input-dia').value = localToInputDate(todayLocal());
+    document.getElementById('input-semana').value = localToInputDate(todayLocal());
+    document.getElementById('upload-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'block';
+    selectedSedes = loadSelectedSedes();
+    updateSedePickerCount();
+    renderSedePickerList();
+    switchTab('ok');
+    setFilterMode('dia');
+  } catch(err){
+    console.error(err);
+    setUploadStatus('Error al leer el archivo: ' + err.message, 'err');
+  }
+}
+
+function setUploadStatus(msg, cls){
+  uploadStatus.textContent = msg;
+  uploadStatus.className = 'upload-status' + (cls ? ' ' + cls : '');
+}
+
+function resetApp(){
+  ALL_ROWS = [];
+  checkedIds = new Set();
+  modalSedeKey = null;
+  closeModal();
+  fileInput.value = '';
+  setUploadStatus('', '');
+  document.getElementById('upload-screen').style.display = 'block';
+  document.getElementById('app-screen').style.display = 'none';
+}
+
+// ====================== SEDE PICKER (persistido en localStorage) ======================
+function loadSelectedSedes(){
+  try {
+    const raw = localStorage.getItem(SEDE_PICKER_STORAGE_KEY);
+    const saved = raw ? JSON.parse(raw) : null;
+    // Si nunca eligió nada guardado, arrancamos con todas tildadas.
+    if (!saved || !Array.isArray(saved) || !saved.length) return ALL_SEDE_LIST.map(s => s.label);
+    // Filtramos por si el listado de sedes cambiara en el futuro.
+    const valid = new Set(ALL_SEDE_LIST.map(s => s.label));
+    return saved.filter(s => valid.has(s));
+  } catch(e){ return ALL_SEDE_LIST.map(s => s.label); }
+}
+function saveSelectedSedes(){
+  try { localStorage.setItem(SEDE_PICKER_STORAGE_KEY, JSON.stringify(selectedSedes)); } catch(e){}
+}
+function toggleSedePicker(){
+  document.getElementById('sede-picker-panel').classList.toggle('open');
+}
+document.addEventListener('click', (e) => {
+  const picker = document.querySelector('.sede-picker');
+  if (picker && !picker.contains(e.target)){
+    document.getElementById('sede-picker-panel').classList.remove('open');
+  }
+});
+function renderSedePickerList(){
+  const list = document.getElementById('sede-picker-list');
+  const q = (document.getElementById('sede-picker-search').value || '').toLowerCase();
+  const items = ALL_SEDE_LIST.filter(s => s.label.toLowerCase().includes(q));
+  if (!items.length){
+    list.innerHTML = '<p style="font-size:11px;color:var(--muted);padding:6px">Sin coincidencias.</p>';
+    return;
+  }
+  list.innerHTML = items.map(s => `<label class="sede-picker-item">
+    <input type="checkbox" value="${escapeHtml(s.label)}" ${selectedSedes.includes(s.label)?'checked':''} onchange="onSedeCheck('${escapeHtml(s.label).replace(/'/g,"\\'")}', this.checked)">
+    <span>${escapeHtml(s.label)}</span>
+  </label>`).join('');
+}
+function onSedeCheck(label, checked){
+  if (checked){ if (!selectedSedes.includes(label)) selectedSedes.push(label); }
+  else { selectedSedes = selectedSedes.filter(s => s !== label); }
+  saveSelectedSedes();
+  updateSedePickerCount();
+  renderAll();
+}
+function selectAllSedes(){
+  selectedSedes = ALL_SEDE_LIST.map(s => s.label);
+  saveSelectedSedes();
+  updateSedePickerCount();
+  renderSedePickerList();
+  renderAll();
+}
+function clearAllSedes(){
+  selectedSedes = [];
+  saveSelectedSedes();
+  updateSedePickerCount();
+  renderSedePickerList();
+  renderAll();
+}
+function updateSedePickerCount(){
+  document.getElementById('sede-picker-count').textContent = selectedSedes.length;
+}
+
+// ====================== TABS Y FILTROS ======================
+function switchTab(tab){
+  currentTab = tab;
+  document.getElementById('tab-ok').classList.toggle('active', tab === 'ok');
+  document.getElementById('tab-anu').classList.toggle('active', tab === 'anu');
+  document.getElementById('summary-total-label').textContent = tab === 'ok'
+    ? 'Clases de prueba (confirmadas + registradas)'
+    : 'Clases de prueba anuladas';
+  checkedIds = new Set();
+  closeModal();
+  renderAll();
+}
+
+function setFilterMode(mode){
+  filterMode = mode;
+  document.querySelectorAll('#filter-mode-buttons button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  document.getElementById('filter-controls-dia').style.display = mode === 'dia' ? 'flex' : 'none';
+  document.getElementById('filter-controls-semana').style.display = mode === 'semana' ? 'flex' : 'none';
+  document.getElementById('filter-controls-rango').style.display = mode === 'rango' ? 'flex' : 'none';
+  renderAll();
+}
+
+// Devuelve {desde, hasta} (Date, inclusive) según el filtro activo, o null = sin filtro (todo)
+function getActiveRange(){
+  if (filterMode === 'todo') return null;
+  if (filterMode === 'dia'){
+    const d = inputDateToLocal(document.getElementById('input-dia').value);
+    if (!d) return null;
+    return { desde: d, hasta: d };
+  }
+  if (filterMode === 'semana'){
+    const ref = inputDateToLocal(document.getElementById('input-semana').value);
+    if (!ref) return null;
+    const mon = mondayOf(ref);
+    const sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
+    document.getElementById('semana-range-label').textContent = fmtFecha(mon) + ' – ' + fmtFecha(sun);
+    return { desde: mon, hasta: sun };
+  }
+  if (filterMode === 'rango'){
+    const desde = inputDateToLocal(document.getElementById('input-rango-desde').value);
+    const hasta = inputDateToLocal(document.getElementById('input-rango-hasta').value);
+    if (!desde && !hasta) return null;
+    return { desde: desde || hasta, hasta: hasta || desde };
+  }
+  return null;
+}
+
+function rowInRange(row, range){
+  if (!range) return true;
+  if (!row.fecha) return false;
+  const k = dateKey(row.fecha);
+  return k >= dateKey(range.desde) && k <= dateKey(range.hasta);
+}
+
+// ====================== RENDER ======================
+function renderAll(){
+  if (!ALL_ROWS.length) return;
+  const range = getActiveRange();
+
+  const okRows = ALL_ROWS.filter(r => !r.anulada);
+  const anuRows = ALL_ROWS.filter(r => r.anulada);
+  document.getElementById('pill-ok').textContent = okRows.filter(r => rowInRange(r, range)).length;
+  document.getElementById('pill-anu').textContent = anuRows.filter(r => rowInRange(r, range)).length;
+
+  const baseRows = currentTab === 'ok' ? okRows : anuRows;
+  const filtered = baseRows.filter(r => rowInRange(r, range));
+  const otherCount = currentTab === 'ok'
+    ? anuRows.filter(r => rowInRange(r, range)).length
+    : okRows.filter(r => rowInRange(r, range)).length;
+
+  document.getElementById('summary-total').textContent = filtered.length;
+  document.getElementById('summary-anuladas').textContent = currentTab === 'ok' ? otherCount : filtered.length;
+  if (currentTab === 'anu') document.getElementById('summary-total-label').textContent = 'Clases de prueba anuladas';
+
+  // Agrupar por sede (solo las tildadas en el selector de sedes)
+  const bySede = new Map();
+  filtered.forEach(r => {
+    if (selectedSedes.length && !selectedSedes.includes(r.sedeLabel)) return;
+    const key = r.sedeNum + '|' + r.sedeLabel;
+    if (!bySede.has(key)) bySede.set(key, []);
+    bySede.get(key).push(r);
+  });
+  document.getElementById('summary-sedes').textContent = bySede.size;
+
+  const sortedKeys = [...bySede.keys()].sort((a,b) => {
+    const na = parseInt(a.split('|')[0],10), nb = parseInt(b.split('|')[0],10);
+    return na - nb;
+  });
+
+  const listEl = document.getElementById('sede-list');
+  if (!selectedSedes.length){
+    listEl.innerHTML = '<div class="empty-state">No hay sedes seleccionadas. Abrí "Sedes" arriba y elegí cuáles ver.</div>';
+  } else if (!sortedKeys.length){
+    listEl.innerHTML = '<div class="empty-state">No hay clases de prueba' + (currentTab==='anu' ? ' anuladas' : '') + ' para este período en las sedes seleccionadas.</div>';
+  } else {
+    listEl.innerHTML = sortedKeys.map(key => {
+      const [num, label] = key.split('|');
+      const rows = bySede.get(key);
+      return '<div class="sede-card" onclick="openModal(\'' + key.replace(/'/g,"\\'") + '\')">' +
+        '<div class="sede-card-top">' +
+          '<span class="sede-num-badge">#' + num + '</span>' +
+          '<span class="sede-name">' + escapeHtml(label) + '</span>' +
+        '</div>' +
+        '<div class="sede-count-big">' + rows.length + '</div>' +
+        '<div class="sede-count-lbl">clases de prueba</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // Si el modal está abierto, lo refrescamos con los datos actualizados (o lo cerramos si ya no aplica)
+  if (modalSedeKey){
+    if (bySede.has(modalSedeKey)) renderModalBody(modalSedeKey, bySede.get(modalSedeKey));
+    else closeModal();
+  }
+}
+
+function toggleCheck(id, checked){
+  if (checked) checkedIds.add(id); else checkedIds.delete(id);
+  if (modalSedeKey) renderAll();
+}
+
+// ====================== MODAL DE DETALLE POR SEDE ======================
+function openModal(key){
+  modalSedeKey = key;
+  document.getElementById('modal-overlay').classList.add('open');
+  renderAll();
+}
+function closeModal(){
+  modalSedeKey = null;
+  const el = document.getElementById('modal-overlay');
+  if (el) el.classList.remove('open');
+}
+function renderModalBody(key, rows){
+  const [num, label] = key.split('|');
+  document.getElementById('modal-num').textContent = '#' + num;
+  document.getElementById('modal-title').textContent = label;
+
+  const sorted = rows.slice().sort((a,b) => (a.fecha?.getTime()||0) - (b.fecha?.getTime()||0));
+  const rowsHtml = sorted.map(r => {
+    const estadoBadge = r.anulada ? '<span class="badge anulada">Anulada</span>'
+      : (r.confirmada ? '<span class="badge confirmada">Confirmada</span>' : '<span class="badge registrada">Registrada</span>');
+    const checked = checkedIds.has(r.id) ? 'checked' : '';
+    return '<tr>' +
+      (currentTab === 'ok' ? '<td><input type="checkbox" data-id="'+r.id+'" '+checked+' onchange="toggleCheck('+r.id+', this.checked)"></td>' : '') +
+      '<td>' + escapeHtml(fmtFecha(r.fecha)) + '</td>' +
+      '<td>' + escapeHtml(fmtHora(r.fecha)) + '</td>' +
+      '<td>' + escapeHtml(r.nombre) + '</td>' +
+      '<td>' + escapeHtml(cleanPhone(r.telefono)) + '</td>' +
+      '<td>' + escapeHtml(r.email) + '</td>' +
+      '<td>' + escapeHtml(r.actividad) + '</td>' +
+      '<td>' + estadoBadge + '</td>' +
+    '</tr>';
+  }).join('');
+
+  const waButtons = currentTab === 'ok' ? (
+    '<div class="sede-actions">' +
+      '<button class="btn-wa" onclick="enviarASede(\'' + num + '\', \'' + key.replace(/'/g,"\\'") + '\')">📲 Enviar a la sede</button>' +
+      '<button class="btn-wa outline" onclick="enviarAOtro(\'' + key.replace(/'/g,"\\'") + '\')">📲 Enviar a otro destinatario</button>' +
+    '</div>' +
+    '<div class="sede-hint">Si tildás filas de la tabla, el mensaje incluye solo esas. Si no tildás ninguna, va con todas las de abajo.</div>'
+  ) : '';
+
+  document.getElementById('modal-body').innerHTML = waButtons +
+    '<table class="detail-table"><thead><tr>' +
+      (currentTab === 'ok' ? '<th></th>' : '') +
+      '<th>Fecha</th><th>Hora</th><th>Nombre</th><th>Teléfono</th><th>Mail</th><th>Actividad</th><th>Estado</th>' +
+    '</tr></thead><tbody>' + rowsHtml + '</tbody></table>';
+}
+
+// ====================== MENSAJE DE WHATSAPP ======================
+function armarMensaje(sedeKey){
+  const range = getActiveRange();
+  const okRows = ALL_ROWS.filter(r => !r.anulada && rowInRange(r, range));
+  const [numStr] = sedeKey.split('|');
+  const num = parseInt(numStr, 10);
+  const rowsSede = okRows.filter(r => r.sedeNum === num);
+  const tildadas = rowsSede.filter(r => checkedIds.has(r.id));
+  const rows = tildadas.length ? tildadas : rowsSede;
+  if (!rows.length){
+    alert('No hay clases de prueba para incluir en el mensaje.');
+    return null;
+  }
+  const listado = rows.map(r => (r.nombre || '—') + ' | ' + fmtHora(r.fecha) + ' | ' + (r.actividad || '—')).join('\n');
+  return 'Equipo! Les dejo las clases de prueba que tenemos hoy!\n\n' +
+    listado +
+    '\n\nRecuerden brindar una excelente experiencia y realizar el cierre de venta, si no concreta la compra agendemos otra clase! Exitos!';
+}
+
+function enviarASede(numStr, sedeKey){
+  const num = parseInt(numStr, 10);
+  const telefono = PHONES_BY_SEDE_NUM[num];
+  if (!telefono){
+    alert('Todavía no tengo el teléfono de WhatsApp de esta sede cargado. Pasámelo y lo agrego.');
+    return;
+  }
+  const mensaje = armarMensaje(sedeKey);
+  if (!mensaje) return;
+  const url = 'https://wa.me/' + telefono + '?text=' + encodeURIComponent(mensaje);
+  window.open(url, '_blank');
+}
+
+function enviarAOtro(sedeKey){
+  const mensaje = armarMensaje(sedeKey);
+  if (!mensaje) return;
+  const url = 'https://wa.me/?text=' + encodeURIComponent(mensaje);
+  window.open(url, '_blank');
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
