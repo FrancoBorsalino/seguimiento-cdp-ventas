@@ -107,6 +107,7 @@ main { padding: 1.75rem 2.5rem 3rem; max-width: 1500px; margin: 0 auto; }
 .filter-range-label { font-size: 12.5px; color: var(--light); background: var(--bg3); padding: .35rem .75rem; border-radius: 5px; border: 1px solid var(--border); }
 .btn-clear-filter { background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 11px; padding: .4rem .7rem; border-radius: 5px; cursor: pointer; margin-left: auto; text-transform: uppercase; letter-spacing: .05em; }
 .btn-clear-filter:hover { border-color: var(--orange); color: var(--text); }
+.filter-turno-label { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
 
 /* ============ SEDE PICKER ============ */
 .sede-picker { position: relative; }
@@ -278,6 +279,17 @@ table.detail-table tr:hover td { background: var(--bg3); }
       <button class="btn-clear-filter" onclick="setFilterMode('todo')">Ver todo</button>
     </div>
 
+    <div class="filter-bar">
+      <span class="filter-turno-label">Turno</span>
+      <div class="filter-mode" id="filter-turno-buttons">
+        <button class="active" data-turno="todos" onclick="setTurnoFilter('todos')">Todos</button>
+        <button data-turno="manana" onclick="setTurnoFilter('manana')">Mañana</button>
+        <button data-turno="tarde" onclick="setTurnoFilter('tarde')">Tarde</button>
+        <button data-turno="sabado" onclick="setTurnoFilter('sabado')">Sábados</button>
+      </div>
+      <span class="small-muted">Lun a vie: mañana hasta las 14:00, tarde de 14:00 en adelante. Sábados: un solo turno, sin dividir por hora.</span>
+    </div>
+
     <div class="summary-row">
       <div class="summary-card reg">
         <div class="num" id="summary-total">0</div>
@@ -376,6 +388,7 @@ const SEDE_PICKER_STORAGE_KEY = 'core_clases_prueba_sedes_seleccionadas';
 let ALL_ROWS = [];      // todas las filas normalizadas del excel cargado
 let currentTab = 'ok';  // 'ok' | 'anu'
 let filterMode = 'dia'; // 'dia' | 'semana' | 'rango' | 'todo'
+let turnoFilter = 'todos'; // 'todos' | 'manana' | 'tarde' | 'sabado'
 let checkedIds = new Set();
 let selectedSedes = [];   // labels de sede elegidas en el picker (persistido en localStorage)
 let modalSedeKey = null;  // key de la sede abierta en el modal ("num|label"), o null
@@ -648,6 +661,27 @@ function rowInRange(row, range){
   return k >= dateKey(range.desde) && k <= dateKey(range.hasta);
 }
 
+// Turno: sábado (getDay()===6) es un solo turno sin importar la hora.
+// Lun a vie: mañana = hasta antes de las 14:00, tarde = de 14:00 en adelante.
+function getTurno(fecha){
+  if (!fecha) return null;
+  if (fecha.getDay() === 6) return 'sabado';
+  return fecha.getHours() < 14 ? 'manana' : 'tarde';
+}
+function rowInTurno(row, turno){
+  if (turno === 'todos') return true;
+  if (!row.fecha) return false;
+  return getTurno(row.fecha) === turno;
+}
+function matchesFilters(row, range){
+  return rowInRange(row, range) && rowInTurno(row, turnoFilter);
+}
+function setTurnoFilter(turno){
+  turnoFilter = turno;
+  document.querySelectorAll('#filter-turno-buttons button').forEach(b => b.classList.toggle('active', b.dataset.turno === turno));
+  renderAll();
+}
+
 // ====================== RENDER ======================
 function renderAll(){
   if (!ALL_ROWS.length) return;
@@ -655,14 +689,14 @@ function renderAll(){
 
   const okRows = ALL_ROWS.filter(r => !r.anulada);
   const anuRows = ALL_ROWS.filter(r => r.anulada);
-  document.getElementById('pill-ok').textContent = okRows.filter(r => rowInRange(r, range)).length;
-  document.getElementById('pill-anu').textContent = anuRows.filter(r => rowInRange(r, range)).length;
+  document.getElementById('pill-ok').textContent = okRows.filter(r => matchesFilters(r, range)).length;
+  document.getElementById('pill-anu').textContent = anuRows.filter(r => matchesFilters(r, range)).length;
 
   const baseRows = currentTab === 'ok' ? okRows : anuRows;
-  const filtered = baseRows.filter(r => rowInRange(r, range));
+  const filtered = baseRows.filter(r => matchesFilters(r, range));
   const otherCount = currentTab === 'ok'
-    ? anuRows.filter(r => rowInRange(r, range)).length
-    : okRows.filter(r => rowInRange(r, range)).length;
+    ? anuRows.filter(r => matchesFilters(r, range)).length
+    : okRows.filter(r => matchesFilters(r, range)).length;
 
   document.getElementById('summary-total').textContent = filtered.length;
   document.getElementById('summary-anuladas').textContent = currentTab === 'ok' ? otherCount : filtered.length;
@@ -766,7 +800,7 @@ function renderModalBody(key, rows){
 // ====================== MENSAJE DE WHATSAPP ======================
 function armarMensaje(sedeKey){
   const range = getActiveRange();
-  const okRows = ALL_ROWS.filter(r => !r.anulada && rowInRange(r, range));
+  const okRows = ALL_ROWS.filter(r => !r.anulada && matchesFilters(r, range));
   const [numStr] = sedeKey.split('|');
   const num = parseInt(numStr, 10);
   const rowsSede = okRows.filter(r => r.sedeNum === num);
