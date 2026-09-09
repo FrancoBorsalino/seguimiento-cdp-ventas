@@ -805,7 +805,9 @@ function armarMensaje(sedeKey){
   const num = parseInt(numStr, 10);
   const rowsSede = okRows.filter(r => r.sedeNum === num);
   const tildadas = rowsSede.filter(r => checkedIds.has(r.id));
-  const rows = tildadas.length ? tildadas : rowsSede;
+  const rows = (tildadas.length ? tildadas : rowsSede)
+    .slice()
+    .sort((a, b) => (a.fecha?.getTime() || 0) - (b.fecha?.getTime() || 0));
   if (!rows.length){
     alert('No hay clases de prueba para incluir en el mensaje.');
     return null;
