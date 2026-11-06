@@ -360,7 +360,9 @@ const SEDE_MAP = {
   'NUÑEZ, ARRIBEÑOS':           { num: 30, label: '30 - ARRIBEÑOS' },
   'RETIRO, ESMERALDA':          { num: 31, label: '31 - ESMERALDA' },
   'DEVOTO, NUEVA YORK':         { num: 32, label: '32 - DEVOTO' },
-  'MARTINEZ, EDUARDO COSTA':    { num: 33, label: '33 - MARTINEZ' }
+  'MARTINEZ, EDUARDO COSTA':    { num: 33, label: '33 - MARTINEZ' },
+  'PUEYRREDÓN, MOSCONI':        { num: 34, label: '34 - MOSCONI' },
+  'CABALLITO, PARRAL':          { num: 35, label: '35 - PARRAL' }
 };
 
 // Teléfono de WhatsApp de cada sede, clave = número de sede (igual que en seguimiento-mkt.html)
@@ -373,7 +375,7 @@ const PHONES_BY_SEDE_NUM = {
   21: '5491168764459', 22: '5491180244212', 23: '5491168681814', 24: '5491168699044',
   25: '5491168747973', 26: '5491167938887', 27: '5491130269217', 28: '5491130001629',
   29: '5491153315669', 30: '5491130340067', 31: '5491130337185', 32: '5491124900155',
-  33: '5491171661730'
+  33: '5491171661730', 34: '5491166164745', 35: '5491151225995'
 };
 
 function sedeInfo(nombreExcel){
@@ -384,6 +386,7 @@ function sedeInfo(nombreExcel){
 // Lista fija de sedes (num + label), ordenada, para el selector — no depende del excel cargado.
 const ALL_SEDE_LIST = Object.values(SEDE_MAP).sort((a,b) => a.num - b.num);
 const SEDE_PICKER_STORAGE_KEY = 'core_clases_prueba_sedes_seleccionadas';
+const SEDE_KNOWN_STORAGE_KEY = 'core_clases_prueba_sedes_conocidas'; // sedes que existían la última vez que se guardó
 
 // ====================== ESTADO EN MEMORIA (nada se persiste) ======================
 let ALL_ROWS = [];      // todas las filas normalizadas del excel cargado
@@ -548,18 +551,26 @@ function resetApp(){
 
 // ====================== SEDE PICKER (persistido en localStorage) ======================
 function loadSelectedSedes(){
+  const todas = ALL_SEDE_LIST.map(s => s.label);
   try {
     const raw = localStorage.getItem(SEDE_PICKER_STORAGE_KEY);
     const saved = raw ? JSON.parse(raw) : null;
     // Si nunca eligió nada guardado, arrancamos con todas tildadas.
-    if (!saved || !Array.isArray(saved) || !saved.length) return ALL_SEDE_LIST.map(s => s.label);
-    // Filtramos por si el listado de sedes cambiara en el futuro.
-    const valid = new Set(ALL_SEDE_LIST.map(s => s.label));
-    return saved.filter(s => valid.has(s));
-  } catch(e){ return ALL_SEDE_LIST.map(s => s.label); }
+    if (!saved || !Array.isArray(saved) || !saved.length) return todas;
+    const valid = new Set(todas);
+    let result = saved.filter(s => valid.has(s));
+    // Sedes nuevas (que no existían cuando se guardó la selección) entran tildadas por defecto.
+    const knownRaw = localStorage.getItem(SEDE_KNOWN_STORAGE_KEY);
+    const known = new Set(knownRaw ? JSON.parse(knownRaw) : saved);
+    todas.forEach(l => { if (!known.has(l) && !result.includes(l)) result.push(l); });
+    return result;
+  } catch(e){ return todas; }
 }
 function saveSelectedSedes(){
-  try { localStorage.setItem(SEDE_PICKER_STORAGE_KEY, JSON.stringify(selectedSedes)); } catch(e){}
+  try {
+    localStorage.setItem(SEDE_PICKER_STORAGE_KEY, JSON.stringify(selectedSedes));
+    localStorage.setItem(SEDE_KNOWN_STORAGE_KEY, JSON.stringify(ALL_SEDE_LIST.map(s => s.label)));
+  } catch(e){}
 }
 function toggleSedePicker(){
   document.getElementById('sede-picker-panel').classList.toggle('open');
